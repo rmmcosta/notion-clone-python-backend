@@ -1,33 +1,13 @@
-# Python artifacts
+.vercel
+*.log
 *.pyc
-*.pyo
-*.pyd
-__pycache__/
-*.egg-info/
-dist/
-build/
-*.egg
+__pycache__
 
-# Virtual environment
-venv/
-
-# Flask instance folder
-instance/
-
-# Flask session cookies
-.flask_session/
-
-# Flask file uploads
-uploads/
-
-# Pytest cache
-.pytest_cache/
-
-# PyCharm project settings
-.idea/
-
-# VS Code settings
-.vscode/
-
-# Jupyter Notebook
-.ipynb_checkpoints
+# Environments 
+.env 
+.venv 
+env/ 
+venv/ 
+ENV/ 
+env.bak/ 
+venv.bak/ 
