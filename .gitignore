@@ -1,0 +1,33 @@
+# Python artifacts
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environment
+venv/
+
+# Flask instance folder
+instance/
+
+# Flask session cookies
+.flask_session/
+
+# Flask file uploads
+uploads/
+
+# Pytest cache
+.pytest_cache/
+
+# PyCharm project settings
+.idea/
+
+# VS Code settings
+.vscode/
+
+# Jupyter Notebook
+.ipynb_checkpoints
