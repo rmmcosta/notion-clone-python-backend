@@ -1,12 +1,12 @@
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request, jsonify, make_response, Response
+from flask_cors import CORS
 import time
 from openai import OpenAI
 import os
 
 app = Flask(__name__)
 client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY',''))
-
-from flask import Response
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 @app.route('/api/completion/metrics', methods=['POST'])
 def completionMetrics():
