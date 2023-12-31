@@ -8,42 +8,8 @@ client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY',''))
 
 from flask import Response
 
-@app.route('/api/completion', methods=['POST'])
-def completion():
-    data = request.get_json()
-    prompt = data['prompt']
-
-    def generate():
-        completion = client.chat.completions.create(
-            model='gpt-3.5-turbo',
-            messages=[
-                {
-                    'role': 'system',
-                    'content': '''You are a helpful AI embedded in a notion text editor app that is used to autocomplete sentences.
-                    The traits of AI include expert knowledge, helpfulness, cleverness, and articulateness.
-                    AI is a well-behaved and well-mannered individual.
-                    AI is always friendly, kind, and inspiring, and he is eager to provide vivid and thoughtful responses to the user.'''
-                },
-                {
-                    'role': 'user',
-                    'content': '''I am writing a piece of text in a notion text editor app.
-                    Help me complete my train of thought here: ##{}##
-                    keep the tone of the text consistent with the rest of the text.
-                    keep the response short and sweet.'''.format(prompt)
-                },
-            ],
-            stream=True
-        )
-
-        for chunk in completion:
-            chunk_message = chunk.choices[0].delta.content
-            if chunk_message is not None:
-                yield chunk_message
-
-    return Response(generate(), mimetype='text/plain')
-
 @app.route('/api/completion/metrics', methods=['POST'])
-def completion():
+def completionMetrics():
     data = request.get_json()
     prompt = data['prompt']
 
@@ -86,6 +52,40 @@ def completion():
         'time': chunk_time,
         'conversation': full_reply_content
     })
+    
+@app.route('/api/completion', methods=['POST'])
+def completion():
+    data = request.get_json()
+    prompt = data['prompt']
+
+    def generate():
+        completion = client.chat.completions.create(
+            model='gpt-3.5-turbo',
+            messages=[
+                {
+                    'role': 'system',
+                    'content': '''You are a helpful AI embedded in a notion text editor app that is used to autocomplete sentences.
+                    The traits of AI include expert knowledge, helpfulness, cleverness, and articulateness.
+                    AI is a well-behaved and well-mannered individual.
+                    AI is always friendly, kind, and inspiring, and he is eager to provide vivid and thoughtful responses to the user.'''
+                },
+                {
+                    'role': 'user',
+                    'content': '''I am writing a piece of text in a notion text editor app.
+                    Help me complete my train of thought here: ##{}##
+                    keep the tone of the text consistent with the rest of the text.
+                    keep the response short and sweet.'''.format(prompt)
+                },
+            ],
+            stream=True
+        )
+
+        for chunk in completion:
+            chunk_message = chunk.choices[0].delta.content
+            if chunk_message is not None:
+                yield chunk_message
+
+    return Response(generate(), mimetype='text/plain')
 
 @app.route('/api/hello', methods=['GET'])
 def hello():
