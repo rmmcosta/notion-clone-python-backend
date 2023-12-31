@@ -1,10 +1,10 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 import time
 from openai import OpenAI
 import os
 
 app = Flask(__name__)
-client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY',''))
 
 @app.route('/api/completion', methods=['POST'])
 def completion():
@@ -50,6 +50,20 @@ def completion():
         'time': chunk_time,
         'conversation': full_reply_content
     })
+
+@app.route('/api/hello', methods=['GET'])
+def hello():
+    response = make_response('Hello, World!')
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
+
+@app.route('/api/env-var-test', methods=['GET'])
+def envVarTest():
+    return os.environ.get('MY_ENV_VAR','MY_ENV_VAR Not Found')
+
+@app.route('/')
+def home():
+    return "Working..."
 
 if __name__ == '__main__':
     app.run()
