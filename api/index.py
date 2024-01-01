@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, make_response, Response
 from flask_cors import CORS
 import time
-from openai import OpenAI
+from openai import OpenAI, OpenAIError
 import os
 
 app = Flask(__name__)
@@ -59,39 +59,42 @@ def completion():
     prompt = data['prompt']
 
     def generate():
-        completion = client.chat.completions.create(
-            model='gpt-3.5-turbo',
-            messages=[
-                {
-                    'role': 'system',
-                    'content': '''You are a helpful AI embedded in a notion text editor app that is used to autocomplete sentences.
-                    The traits of AI include expert knowledge, helpfulness, cleverness, and articulateness.
-                    AI is a well-behaved and well-mannered individual.
-                    AI is always friendly, kind, and inspiring, and he is eager to provide vivid and thoughtful responses to the user.'''
-                },
-                {
-                    'role': 'user',
-                    'content': '''I am writing a piece of text in a notion text editor app.
-                    Help me complete my train of thought here: ##{}##
-                    keep the tone of the text consistent with the rest of the text.
-                    keep the response short and sweet.'''.format(prompt)
-                },
-            ],
-            stream=True
-        )
+        try:
+            completion = client.chat.completions.create(
+                model='gpt-3.5-turbo',
+                messages=[
+                    {
+                        'role': 'system',
+                        'content': '''You are a helpful AI embedded in a notion text editor app that is used to autocomplete sentences.
+                        The traits of AI include expert knowledge, helpfulness, cleverness, and articulateness.
+                        AI is a well-behaved and well-mannered individual.
+                        AI is always friendly, kind, and inspiring, and he is eager to provide vivid and thoughtful responses to the user.'''
+                    },
+                    {
+                        'role': 'user',
+                        'content': '''I am writing a piece of text in a notion text editor app.
+                        Help me complete my train of thought here: ##{}##
+                        keep the tone of the text consistent with the rest of the text.
+                        keep the response short and sweet.'''.format(prompt)
+                    },
+                ],
+                stream=True
+            )
 
-        for chunk in completion:
-            chunk_message = chunk.choices[0].delta.content
-            if chunk_message is not None:
-                yield chunk_message
+            for chunk in completion:
+                chunk_message = chunk.choices[0].delta.content
+                if chunk_message is not None:
+                    yield chunk_message
+        except OpenAIError as e:
+            if e.status_code == 429:
+                print("Too many requests, not retrying.")
+                return
 
     return Response(generate(), mimetype='text/plain')
 
 @app.route('/api/hello', methods=['GET'])
 def hello():
-    response = make_response('Hello, World!')
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    return response
+    return make_response('Hello, World!')
 
 @app.route('/api/env-var-test', methods=['GET'])
 def envVarTest():
