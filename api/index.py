@@ -87,8 +87,8 @@ def completion():
                     yield chunk_message
         except OpenAIError as e:
             if e.status_code == 429:
-                print("Too many requests, not retrying.")
-                return
+                print("Too many requests")
+                yield jsonify({"error": "Too many requests"}), 429
 
     return Response(generate(), mimetype='text/plain')
 
